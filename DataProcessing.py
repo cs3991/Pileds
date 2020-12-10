@@ -35,6 +35,6 @@ df_svg = dataframe[datetime.datetime.now() - pd.Timedelta('1 day'):]
 df_svg.plot()
 plt.grid(True, which="both", axis="y")
 plt.savefig("/var/www/html/last24h.svg")
-print("Température intérieure :", int(df_svg.Temperature_int[-1]*100)/100, "°C")
+print("Température intérieure :", int(df_svg.Temperature_int[df_svg.Temperature_int.last_valid_index()]*100)/100, "°C")
 print('<br>')
-print("Température extérieure :", int(df_svg.Temperature_ext[-1]*100)/100, "°C")
+print("Température extérieure :", int(df_svg.Temperature_ext[df_svg.Temperature_ext.last_valid_index()]*100)/100, "°C")
