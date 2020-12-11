@@ -49,19 +49,22 @@ def fetch_outdoor_temp():
     return float(response.json()['main']['temp'])
 
 
-past_time = datetime.now() - timedelta(minutes=30)
+past_time_sensor = datetime.now() - timedelta(minutes=30)
+past_time_api = datetime.now() - timedelta(minutes=30)
 try:
-    while(1):
+    while 1:
         date = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-        if (datetime.now() - past_time > timedelta(minutes=NB_MIN_DELAY_SENSOR)):
+        if datetime.now() - past_time_sensor > timedelta(minutes=NB_MIN_DELAY_SENSOR):
             in_temp = fetch_sensor_temp()
+            past_time_sensor = datetime.now()
         else:
             in_temp = ''
-        if (datetime.now() - past_time > timedelta(minutes=NB_MIN_DELAY_API)):
+        if datetime.now() - past_time_api > timedelta(minutes=NB_MIN_DELAY_API):
             out_temp = fetch_outdoor_temp()
+            past_time_api = datetime.now()
+
         else:
             out_temp = ''
-        past_time = datetime.now()
         try:
             filename = 'temperatures/' + date.split(' ')[0] + '.csv'
             # filename = 'temperatures.csv'
