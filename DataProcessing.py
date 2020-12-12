@@ -26,7 +26,8 @@ for filename in files:
 
 
 dataframe = pd.concat(li, axis='index').sort_index()
-dataframe = dataframe.rolling('10min').mean()
+dataframe = dataframe.interpolate()
+dataframe["Temperature_int"] = dataframe["Temperature_int"].rolling('10min').mean()
 
 # dataframe.plot()
 # plt.show()
