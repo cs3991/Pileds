@@ -36,17 +36,23 @@ def create_dir(path, isFile=False):
     return file_name
 
 def fetch_sensor_temp():
-    out = subprocess.Popen(['cat', file_temperature],
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.STDOUT)
-    stdout, stderr = out.communicate()
-    #print("sensor fetched")
-    return float(re.search(r't=(\d{5})', str(stdout)).group(1)) / 1000
+    try:
+        out = subprocess.Popen(['cat', file_temperature],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
+        stdout, stderr = out.communicate()
+        #print("sensor fetched")
+        return float(re.search(r't=(\d{5})', str(stdout)).group(1)) / 1000
+    except:
+        return ''
 
 def fetch_outdoor_temp():
-    response = requests.get('http://api.openweathermap.org/data/2.5/weather?id=3014728&units=metric&appid=' + API_KEY)
-    #print("request sent")
-    return float(response.json()['main']['temp'])
+    try:
+        response = requests.get('http://api.openweathermap.org/data/2.5/weather?id=3014728&units=metric&appid=' + API_KEY)
+        #print("request sent")
+        return float(response.json()['main']['temp'])
+    except:
+        return ''
 
 
 past_time_sensor = datetime.now() - timedelta(minutes=30)
