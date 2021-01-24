@@ -8,6 +8,7 @@ import time
 from rpi_ws281x import *
 import argparse
 from neopixel_plus import NeoPixel
+import math
 
 # LED strip configuration:
 LED_COUNT = 150  # Number of LED pixels.
@@ -84,26 +85,35 @@ def theaterChaseRainbow(strip, wait_ms=50):
 
 
 def showWithGeom(leds, strip):
-    leds = leds[0:110]
-    if len(leds) != 110:
-        leds.extend([(255, 255, 255) for i in range(110 - len(leds))])
-    for i in range(5, 19):
+    real_len = 90
+    leds = leds[0:real_len]
+    if len(leds) != real_len:
+        leds.extend([(255, 255, 255) for _ in range(real_len - len(leds))])
+    for i in range(28):
         strip.leds[i] = leds[10 + i]
-    for i in range(27, 30):
-        strip.leds[i] = leds[30 - i]
-    for i in range(30, 140):
-        strip.leds[i] = leds[i - 30]
+    for i in range(36, 60):
+        strip.leds[i] = leds[59 - i]
+    for i in range(60, strip.addressable_strip_length):
+        strip.leds[i] = leds[i - 60]
     strip.write()
 
-
-def linearGradient(colorA, colorB, strip, n_start, n_end):
-    length = n_end - n_start
+def linearGradient(colorA, colorB, strip, length):
     leds = []
     for i in range(length):
-        leds.append((colorA[0] - i * abs(colorA[0] - colorB[0]) / length,
-                             (colorA[1] + i * abs(colorA[1] - colorB[1]) / length),
-                             (colorA[2] + i * abs(colorA[2] - colorB[2]) / length)))
+        leds.append((colorA[0] - i * (colorA[0] - colorB[0]) / length,
+                             (colorA[1] - i * (colorA[1] - colorB[1]) / length),
+                             (colorA[2] - i * (colorA[2] - colorB[2]) / length)))
+    print(leds)
     showWithGeom(leds, strip)
+
+def breathingGradient(colorA, colorB, strip, length, period):
+    numberOfValues = 256
+    while(1):
+        for i in range(numberOfValues):
+            k = (math.sin(2 * math.pi * i / numberOfValues) + 1) / 2
+            linearGradient((colorA[0] * k, colorA[1] * k, colorA[2] * k), (colorB[0] * k, colorB[1] * k, colorB[2] * k), strip, length)
+            time.sleep(period / numberOfValues)
+
 
 
 # Main program logic follows:
@@ -111,6 +121,8 @@ if __name__ == '__main__':
     # Process arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--clear', action='store_true', help='clear the display on exit')
+    parser.add_argument('-l', '--light', action='store_true', help='Light up the strip with predefined fixed pattern')
+    parser.add_argument('-t', '--test', action='store_true', help='Light one led at a time to show the index of each led')
     args = parser.parse_args()
 
     # Create NeoPixel object with appropriate configuration.
@@ -118,30 +130,45 @@ if __name__ == '__main__':
     # Intialize the library (must be called once before other functions).
     # strip.begin()
 
-    strip = NeoPixel(pin_num=LED_PIN, n=LED_COUNT, test=False, overwrite_line=False, target="adafruit")
+    strip = NeoPixel(pin_num=LED_PIN,
+                     n=LED_COUNT,
+                     test=False,
+                     overwrite_line=False,
+                     target="adafruit")
 
     try:
-        # showWithGeom([(100, 200, 30), (30, 200, 100)], strip)
-        linearGradient((255, 0, 0), (0, 255, 0), strip, 0, 150)
-        # for i in range(150):
-        #     strip.leds[i] = (255, 0, 0)
-        #     strip.write()
-        #     strip.leds[i] = (0, 0, 0)
-        #     print(i)
-        #     input()
-        # while True:
-        #     print('Color wipe animations.')
-        #     colorWipe(strip, (255, 0, 0))  # Red wipe
-        #     colorWipe(strip, (0, 255, 0))  # Blue wipe
-        #     colorWipe(strip, (0, 0, 255))  # Green wipe
-        #     print('Theater chase animations.')
-        #     theaterChase(strip, (127, 127, 127))  # White theater chase
-        #     theaterChase(strip, (127, 0, 0))  # Red theater chase
-        #     theaterChase(strip, (0, 0, 127))  # Blue theater chase
-        #     print('Rainbow animations.')
-        #     rainbow(strip)
-        #     rainbowCycle(strip)
-        #     theaterChaseRainbow(strip)
+        if args.light:
+            linearGradient((0, 255, 0), (255, 0, 0), strip, 90)
+            # breathingGradient((255, 0, 0), (0, 255, 0), strip, 90, 0.001)
+        if args.clear:
+            strip.fadeout()
+        if args.test:
+            for i in range(strip.addressable_strip_length):
+                input(i)
+                strip.leds[i] = (255, 255, 255)
+                strip.write()
+
+
+
+            # for i in range(150):
+            #     strip.leds[i] = (255, 0, 0)
+            #     strip.write()
+            #     strip.leds[i] = (0, 0, 0)
+            #     print(i)
+            #     input()
+
+            #     print('Color wipe animations.')
+            #     colorWipe(strip, (255, 0, 0))  # Red wipe
+            #     colorWipe(strip, (0, 255, 0))  # Blue wipe
+            #     colorWipe(strip, (0, 0, 255))  # Green wipe
+            #     print('Theater chase animations.')
+            #     theaterChase(strip, (127, 127, 127))  # White theater chase
+            #     theaterChase(strip, (127, 0, 0))  # Red theater chase
+            #     theaterChase(strip, (0, 0, 127))  # Blue theater chase
+            #     print('Rainbow animations.')
+            #     rainbow(strip)
+            #     rainbowCycle(strip)
+            #     theaterChaseRainbow(strip)
 
 
     except KeyboardInterrupt:

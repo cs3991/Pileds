@@ -18,6 +18,7 @@
 
     <img src="last24h.svg"></p>
     <p> <?php echo $output;?> </p>
+    <button></button>
   </body>
 </html>
 
