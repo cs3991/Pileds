@@ -98,6 +98,11 @@ def generate_graph():
     indoor_temp = int(df_svg.Temperature_int[df_svg.Temperature_int.last_valid_index()] * 100) / 100
     outdoor_temp = int(df_svg.Temperature_ext[df_svg.Temperature_ext.last_valid_index()] * 100) / 100
 
+    # Interpolate missing samples and smoothing
+    df_svg = df_svg.interpolate()
+    df_svg["Temperature_int"] = df_svg["Temperature_int"].rolling('20min').mean()
+    df_svg["Temperature_ext"] = df_svg["Temperature_ext"].rolling('30min').mean()
+
     fig, ax1 = plt.subplots()
     # Indoor temperature
     df_svg["Temperature_int"].plot(color='tab:red')
