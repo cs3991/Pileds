@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+import glob
 import os
 import subprocess
 import re
@@ -10,12 +10,8 @@ import requests
 
 API_KEY = '7339f560987519be7f4ef21a7d2dc1ac'
 file_temperature = '/sys/bus/w1/devices/w1_bus_master1/28-3c01a816d8df/w1_slave'
-NB_MIN_DELAY_API = 10
-NB_MIN_DELAY_SENSOR = 2
-
-print("Python temperature log started: \n" +
-      "Sensor logged each" + str(NB_MIN_DELAY_SENSOR) + "min\n" +
-      "API fetched each" + str(NB_MIN_DELAY_API) + "min")
+NB_MIN_DELAY_API = 10  # Number of minutes to wait between two calls to the api
+NB_MIN_DELAY_SENSOR = 2  # Number of minutes to wait between two measures of the sensor
 
 
 def create_dir(path, isFile=False):
@@ -57,32 +53,60 @@ def fetch_outdoor_temp():
         return ''
 
 
-past_time_sensor = datetime.now() - timedelta(minutes=30)
-past_time_api = datetime.now() - timedelta(minutes=30)
-try:
-    while 1:
-        date = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-        if datetime.now() - past_time_sensor > timedelta(minutes=NB_MIN_DELAY_SENSOR):
-            in_temp = fetch_sensor_temp()
-            past_time_sensor = datetime.now()
-        else:
-            in_temp = ''
-        if datetime.now() - past_time_api > timedelta(minutes=NB_MIN_DELAY_API):
-            out_temp = fetch_outdoor_temp()
-            past_time_api = datetime.now()
+def get_last_temps():
+    today = datetime.now()
+    filenames = [today.strftime('%Y/%m/%d'), (today - timedelta(days=1)).strftime('%Y/%m/%d')]
+    files = []
+    for filename in filenames:
+        files.extend(glob.glob(r"temperatures/" + filename + ".csv"))
+    files.sort()
+    with open(files[-1], 'r') as file:
+        line = file.readline(-1)
+    line_split = line.split(';')
+    indoor_temp = float(line_split[1].replace(',', '.'))
+    outdoor_temp = float(line_split[2].replace(',', '.'))
+    return indoor_temp, outdoor_temp
 
-        else:
-            out_temp = ''
-        try:
-            filename = 'temperatures/' + date.split(' ')[0] + '.csv'
-            # filename = 'temperatures.csv'
-            create_dir(filename, True)
-            with open(filename, 'a') as file:
-                file.write(date + ';' + str(in_temp).replace('.', ',') + ';' + str(out_temp).replace('.', ',') + '\n')
-        except IOError :
-            print(datetime.now().strftime("%Y/%m/%d-%H:%M:%S") + " Erreur d'ouverture du fichier")
-            pass
-        time.sleep(120)
 
-except KeyboardInterrupt:
-    exit()
+def main():
+    past_time_sensor = datetime.now() - timedelta(minutes=30)
+    past_time_api = datetime.now() - timedelta(minutes=30)
+    print("Python temperature log started: \n" +
+          "  - Sensor logged each " + str(NB_MIN_DELAY_SENSOR) + " min\n" +
+          "  - API fetched each " + str(NB_MIN_DELAY_API) + " min")
+
+    try:
+        while 1:
+            date = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+            if datetime.now() - past_time_sensor > timedelta(minutes=NB_MIN_DELAY_SENSOR):
+                in_temp = fetch_sensor_temp()
+                past_time_sensor = datetime.now()
+            else:
+                in_temp = ''
+            if datetime.now() - past_time_api > timedelta(minutes=NB_MIN_DELAY_API):
+                out_temp = fetch_outdoor_temp()
+                past_time_api = datetime.now()
+
+            else:
+                out_temp = ''
+            try:
+                filename = 'temperatures/' + date.split(' ')[0] + '.csv'
+                # filename = 'temperatures.csv'
+                create_dir(filename, True)
+                with open(filename, 'a') as file:
+                    file.write(
+                        date + ';' + str(in_temp).replace('.', ',') + ';' + str(out_temp).replace('.', ',') + '\n')
+                # with open("current_temp.txt", 'w') as file:
+                #     file.write(
+                #         date + ';' + str(in_temp).replace('.', ',') + ';' + str(out_temp).replace('.', ',') + '\n')
+            except IOError:
+                print(datetime.now().strftime("%Y/%m/%d-%H:%M:%S") + " Erreur d'ouverture du fichier")
+                pass
+            time.sleep(120)
+
+    except KeyboardInterrupt:
+        exit()
+
+
+if __name__ == '__main__':
+    main()

@@ -1,6 +1,7 @@
 import cherrypy
 import DataProcessing
 import led_strip_control
+import DataProcessing
 
 
 class Root(object):
@@ -14,16 +15,12 @@ class Root(object):
 
     @cherrypy.expose
     def index(self):
-        with open("/home/pi/Developpement/pyled/current_temp.txt") as file:
-            text = file.readline()
-            text_split = text.split(' ')
-            indoorTemp = text_split[0]
-            outdoorTemp = text_split[1]
+        indoor_temp, outdoor_temp = DataProcessing.generate_graph()
         with open("/tmp/pycharm_project_313/index.html") as file:
             html = ''
             for l in file:
                 html += l
-        return html.format(indoorTemp, outdoorTemp)
+        return html.format(indoor_temp, outdoor_temp)
 
     @cherrypy.expose
     def refresh(self):

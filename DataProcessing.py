@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # coding=utf-8
-
+import matplotlib
 import pandas as pd
 import glob
 import matplotlib.pyplot as plt
@@ -8,8 +8,10 @@ import numpy as np
 import datetime
 import os
 
+from tictoc import *
 
-def main():
+
+def generate_complete_data():
     # for testing on windows : switch commented lines
     os.chdir('/home/pi/Developpement/pyled/')
     # os.chdir('Z:\Developpement\pyled')
@@ -64,11 +66,57 @@ def main():
     # plt.show()
     plt.savefig("last24h.svg")
 
-
     # print("Température intérieure :",indoor_temp , "°C")
     # print('<br>')
     # print("Température extérieure :", outdoor_temp, "°C")
     return indoor_temp, outdoor_temp
+
+
+def generate_graph():
+    matplotlib.use('SVG')
+    today = datetime.datetime.now()
+    filenames = [(today - datetime.timedelta(days=1)).strftime('%Y/%m/%d'), today.strftime('%Y/%m/%d')]
+    files = []
+    for filename in filenames:
+        files.extend(glob.glob(r"temperatures/" + filename + ".csv"))
+    li = []
+    for filename in files:
+        df = pd.read_csv(filename,
+                         index_col=0,
+                         parse_dates=[0],
+                         delimiter=';',
+                         names=["DateTimeIndex",
+                                "Temperature_int", "Temperature_ext"],
+                         dtype={"Temperature_int": np.float64, "Temperature_ext": np.float64},
+                         decimal=','
+                         )
+        li.append(df)
+
+    df_svg = pd.concat(li, axis='index').sort_index()[datetime.datetime.now() - pd.Timedelta('1 day'):]
+
+    # Save last measured temperatures
+    indoor_temp = int(df_svg.Temperature_int[df_svg.Temperature_int.last_valid_index()] * 100) / 100
+    outdoor_temp = int(df_svg.Temperature_ext[df_svg.Temperature_ext.last_valid_index()] * 100) / 100
+
+    fig, ax1 = plt.subplots()
+    # Indoor temperature
+    df_svg["Temperature_int"].plot(color='tab:red')
+    ax1.tick_params(axis='y', labelcolor='tab:red')
+    ax1.set_ylabel('Température intérieure', color='tab:red')
+    plt.grid(True, which="both", axis="y")
+    # Outdoor temperature
+    ax2 = ax1.twinx()
+    df_svg["Temperature_ext"].plot(color='tab:blue')
+    ax2.tick_params(axis='y', labelcolor='tab:blue')
+    ax2.set_ylabel('Température extérieure', color='tab:blue')
+    fig.tight_layout()
+    plt.savefig("last24h.svg")
+    return indoor_temp, outdoor_temp
+
+
+def main():
+    generate_complete_data()
+
 
 if __name__ == "__main__":
     main()
