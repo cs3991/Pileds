@@ -73,6 +73,7 @@ def generate_complete_data():
 
 
 def generate_graph():
+    os.chdir('/home/pi/Developpement/pyled/')
     matplotlib.use('SVG')
     today = datetime.datetime.now()
     filenames = [(today - datetime.timedelta(days=1)).strftime('%Y/%m/%d'), today.strftime('%Y/%m/%d')]
