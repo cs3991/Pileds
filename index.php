@@ -7,7 +7,7 @@
   </head>
   <body><p>
     <?php
-    $command = escapeshellcmd('/usr/bin/python3 /home/pi/Scripts/python/DataProcessing.py');
+    $command = escapeshellcmd('/usr/bin/python3 /home/pi/Developpement/pyled/DataProcessing.py');
     $output = shell_exec($command);
 
     if($output == null) {

@@ -14,7 +14,7 @@ class Root(object):
 
     @cherrypy.expose
     def index(self):
-        with open("/home/pi/Scripts/python/current_temp.txt") as file:
+        with open("/home/pi/Developpement/pyled/current_temp.txt") as file:
             text = file.readline()
             text_split = text.split(' ')
             indoorTemp = text_split[0]
@@ -28,7 +28,7 @@ class Root(object):
     @cherrypy.expose
     def refresh(self):
         indoorTemp, outdoorTemp = DataProcessing.main()
-        with open("/home/pi/Scripts/python/current_temp.txt", 'w') as file:
+        with open("/home/pi/Developpement/pyled/current_temp.txt", 'w') as file:
             file.write(str(indoorTemp) + " " + str(outdoorTemp))
         print(indoorTemp, outdoorTemp)
         raise cherrypy.HTTPRedirect("/")

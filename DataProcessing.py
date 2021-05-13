@@ -11,8 +11,8 @@ import os
 
 def main():
     # for testing on windows : switch commented lines
-    os.chdir('/home/pi/Scripts/python/')
-    # os.chdir('Z:\Scripts\python')
+    os.chdir('/home/pi/Developpement/pyled/')
+    # os.chdir('Z:\Developpement\pyled')
 
     files = glob.glob(r"temperatures/*/*/*.csv", recursive=True)
     li = []

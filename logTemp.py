@@ -13,7 +13,9 @@ file_temperature = '/sys/bus/w1/devices/w1_bus_master1/28-3c01a816d8df/w1_slave'
 NB_MIN_DELAY_API = 10
 NB_MIN_DELAY_SENSOR = 2
 
-print("Python script started")
+print("Python temperature log started: \n" +
+      "Sensor logged each" + str(NB_MIN_DELAY_SENSOR) + "min\n" +
+      "API fetched each" + str(NB_MIN_DELAY_API) + "min")
 
 
 def create_dir(path, isFile=False):
