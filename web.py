@@ -24,7 +24,7 @@ class Root(object):
 
     @cherrypy.expose
     def refresh(self):
-        indoorTemp, outdoorTemp = DataProcessing.main()
+        indoorTemp, outdoorTemp = DataProcessing.generate_complete_data()
         with open("/home/pi/Developpement/pyled/current_temp.txt", 'w') as file:
             file.write(str(indoorTemp) + " " + str(outdoorTemp))
         print(indoorTemp, outdoorTemp)
