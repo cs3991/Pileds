@@ -103,7 +103,6 @@ def linearGradient(colorA, colorB, strip, length):
         leds.append((colorA[0] - i * (colorA[0] - colorB[0]) / length,
                              (colorA[1] - i * (colorA[1] - colorB[1]) / length),
                              (colorA[2] - i * (colorA[2] - colorB[2]) / length)))
-    print(leds)
     showWithGeom(leds, strip)
 
 def breathingGradient(colorA, colorB, strip, length, period):
