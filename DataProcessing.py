@@ -13,12 +13,12 @@ from tictoc import *
 
 def generate_complete_data():
     # for testing on windows : switch commented lines
-    os.chdir('/home/pi/Developpement/pyled/')
+    os.chdir('/home/famille/dev/Pileds/')
     # os.chdir('Z:\Developpement\pyled')
 
     files = glob.glob(r"temperatures/*/*/*.csv", recursive=True)
     li = []
-
+    # print('files : ', files)
     for filename in files:
         df = pd.read_csv(filename,
                          index_col=0,
@@ -26,17 +26,16 @@ def generate_complete_data():
                          delimiter=';',
                          names=["DateTimeIndex",
                                 "Temperature_int", "Temperature_ext"],
-                         dtype={"Temperature_int":np.float64, "Temperature_ext":np.float64},
+                         dtype={"Temperature_int": np.float64, "Temperature_ext": np.float64},
                          decimal=','
                          )
         li.append(df)
 
-
     dataframe = pd.concat(li, axis='index').sort_index()
 
     # Save last measured temperatures
-    indoor_temp = int(dataframe.Temperature_int[dataframe.Temperature_int.last_valid_index()]*100)/100
-    outdoor_temp = int(dataframe.Temperature_ext[dataframe.Temperature_ext.last_valid_index()]*100)/100
+    indoor_temp = int(dataframe.Temperature_int[dataframe.Temperature_int.last_valid_index()] * 100) / 100
+    outdoor_temp = int(dataframe.Temperature_ext[dataframe.Temperature_ext.last_valid_index()] * 100) / 100
 
     # Interpolate missing samples and smoothing
     dataframe = dataframe.interpolate()
@@ -73,7 +72,7 @@ def generate_complete_data():
 
 
 def generate_graph():
-    os.chdir('/home/pi/Developpement/pyled/')
+    os.chdir('/home/famille/dev/Pileds/')
     matplotlib.use('SVG')
     today = datetime.datetime.now()
     filenames = [(today - datetime.timedelta(days=1)).strftime('%Y/%m/%d'), today.strftime('%Y/%m/%d')]
@@ -92,12 +91,13 @@ def generate_graph():
                          decimal=','
                          )
         li.append(df)
+        print(li)
 
     df_svg = pd.concat(li, axis='index').sort_index()[datetime.datetime.now() - pd.Timedelta('1 day'):]
 
     # Save last measured temperatures
-    indoor_temp = int(df_svg.Temperature_int[df_svg.Temperature_int.last_valid_index()] * 100) / 100
-    outdoor_temp = int(df_svg.Temperature_ext[df_svg.Temperature_ext.last_valid_index()] * 100) / 100
+    indoor_temp = df_svg.Temperature_int[df_svg.Temperature_int.last_valid_index()]
+    outdoor_temp = df_svg.Temperature_ext[df_svg.Temperature_ext.last_valid_index()]
 
     # Interpolate missing samples and smoothing
     df_svg = df_svg.interpolate()

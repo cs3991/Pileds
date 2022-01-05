@@ -1,0 +1,52 @@
+.col {
+    flex: 1 0 0%;
+}
+
+.row {
+    --gutter-x: 1.5rem;
+    --gutter-y: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(-1 * var(--gutter-y));
+    margin-right: calc(-.5 * var(--gutter-x));
+    margin-left: calc(-.5 * var(--gutter-x));
+}
+
+.row > * {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 100%;
+    padding-right: calc(var(--gutter-x) * .5);
+    padding-left: calc(var(--gutter-x) * .5);
+    margin-top: var(--gutter-y);
+}
+
+.mx-auto {
+	margin-right: auto !important;
+	margin-left: auto !important;
+}
+*, ::after, ::before {
+	box-sizing: border-box;
+}
+
+.d-flex {
+	display: flex !important;
+}
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+	margin-top: 0;
+	margin-bottom: .5rem;
+	line-height: 1.2;
+}
+* {
+	cursor: default !important;
+	pointer-events: all !important;
+}
+p {
+	margin-top: 0;
+	margin-bottom: 1rem;
+}
+:root {
+	--gray-700: #495057;
+	--gray-900: #212529;
+	--body-line-height: 1.5;
+}

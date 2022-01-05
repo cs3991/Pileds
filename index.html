@@ -2,16 +2,28 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Raspberry dashboard</title>
+    <title>Températures</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Catamaran&amp;display=swap">
+    <link rel="stylesheet" href="resources/style.css">
 </head>
-<body>
-<p><img src="resources/last24h.svg" alt="graph"></p>
-<p>
-    Température intérieure : {} °C<br>
-    Température extérieure : {} °C
-</p>
-<a href="refresh">Rafraichir</a>
-<a href="ledOn">Allumer les leds</a>
-<a href="ledOff">Eteindre les leds</a>
+
+
+<body style="padding: 16px;">
+<div class="col">
+    <div class="row">
+        <div class="col"><h1
+                style="color: var(--gray-700);font-size: 22px;font-family: Catamaran, sans-serif;font-weight: bold;text-align: center;">
+            Température intérieure</h1>
+            <p style="color: var(--gray-900);font-size: 50px;font-family: Catamaran, sans-serif;text-align: center;">
+                {} °C</p></div>
+        <div class="col"><h1
+                style="font-size: 22px;color: var(--gray-700);font-family: Catamaran, sans-serif;font-weight: bold;text-align: center;">
+            Température extérieure</h1>
+            <p style="color: var(--gray-900);font-size: 50px;font-family: Catamaran, sans-serif;text-align: center;">
+                {} °C</p></div>
+    </div>
+</div>
+<img class="d-flex mx-auto" style="margin-top: 12px;max-width: 100%;min-width: 200px;"
+     src="resources/last24h.svg" alt="graph">
 </body>
 </html>
