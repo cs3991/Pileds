@@ -6,7 +6,10 @@ import glob
 import matplotlib.pyplot as plt
 import numpy as np
 import datetime
+import dateutil
 import os
+import re
+import json
 
 from tictoc import *
 
@@ -91,7 +94,7 @@ def generate_graph():
                          decimal=','
                          )
         li.append(df)
-        print(li)
+        # print(li)
 
     df_svg = pd.concat(li, axis='index').sort_index()[datetime.datetime.now() - pd.Timedelta('1 day'):]
 
@@ -101,8 +104,18 @@ def generate_graph():
 
     # Interpolate missing samples and smoothing
     df_svg = df_svg.interpolate()
-    df_svg["Temperature_int"] = df_svg["Temperature_int"].rolling('20min').mean()
-    df_svg["Temperature_ext"] = df_svg["Temperature_ext"].rolling('30min').mean()
+    df_svg["Temperature_int"] = df_svg["Temperature_int"].rolling('20min').mean().round(2)
+    df_svg["Temperature_ext"] = df_svg["Temperature_ext"].rolling('30min').mean().round(2)
+
+    with open('last24h.js', 'w') as f:
+        f.write('let temperatures = [\n')
+        for k, v in df_svg.T.to_dict().items():
+            k = k.replace(tzinfo=dateutil.tz.gettz())
+            f.write("{date:" + json.dumps(int(k.timestamp() * 1000)) + ", " + re.sub(r'[{"\']', '', json.dumps(v))+',\n')
+        f.write('];')
+
+
+    # df_svg.to_csv("last24h.csv", float_format='%.1f')
 
     fig, ax1 = plt.subplots()
     # Indoor temperature
@@ -122,6 +135,7 @@ def generate_graph():
 
 def main():
     generate_complete_data()
+    # generate_graph()
 
 
 if __name__ == "__main__":

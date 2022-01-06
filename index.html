@@ -5,6 +5,11 @@
     <title>Températures</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Catamaran&amp;display=swap">
     <link rel="stylesheet" href="resources/style.css">
+    <script src="resources/luxon.min.js"></script>
+    <script src="resources/chart.js"></script>
+    <script src="resources/luxon_adapter.js"></script>
+    <script src="resources/last24h.js"></script>
+    <script src="resources/graph.js" defer></script>
 </head>
 
 
@@ -23,7 +28,9 @@
                 {} °C</p></div>
     </div>
 </div>
-<img class="d-flex mx-auto" style="margin-top: 12px;max-width: 100%;min-width: 200px;"
-     src="resources/last24h.svg" alt="graph">
+
+<div class="chart-container" style="position: relative; height:40vh; width:80vw">
+    <canvas id="temp_graph"></canvas>
+</div>
 </body>
 </html>

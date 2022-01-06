@@ -1,6 +1,7 @@
 /temperatures/*
-/complete_data.csv
 /last24h.svg
 current_temp.txt
 .idea
-
+*.csv
+last24h.js
+__pycache__
