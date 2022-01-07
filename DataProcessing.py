@@ -89,12 +89,12 @@ def generate_graph(generate_svg=False):
                          parse_dates=[0],
                          delimiter=';',
                          names=["DateTimeIndex",
-                                "Temperature_int",
-                                "Temperature_ext",
-                                "temp_network_ext",
-                                "temp_network_int"],
-                         dtype={"Temperature_int": np.float64, "Temperature_ext": np.float64,
-                                "temp_network_ext": np.float64, "temp_network_int": np.float64},
+                                "in1",
+                                "ex1",
+                                "ex2",
+                                "in2"],
+                         dtype={"in1": np.float64, "ex1": np.float64,
+                                "ex2": np.float64, "in2": np.float64},
                          decimal=','
                          )
         li.append(df)
@@ -103,17 +103,17 @@ def generate_graph(generate_svg=False):
     df_svg = pd.concat(li, axis='index').sort_index()[datetime.datetime.now() - pd.Timedelta('1 day'):]
 
     # Save last measured temperatures
-    indoor_temp = df_svg.Temperature_int[df_svg.Temperature_int.last_valid_index()]
-    outdoor_temp = df_svg.Temperature_ext[df_svg.Temperature_ext.last_valid_index()]
-    indoor_temp2 = df_svg.temp_network_int[df_svg.Temperature_int.last_valid_index()]
-    outdoor_temp2 = df_svg.temp_network_ext[df_svg.Temperature_ext.last_valid_index()]
+    indoor_temp = df_svg.in1[df_svg.in1.last_valid_index()]
+    outdoor_temp = df_svg.ex1[df_svg.ex1.last_valid_index()]
+    indoor_temp2 = df_svg.in2[df_svg.in2.last_valid_index()]
+    outdoor_temp2 = df_svg.ex2[df_svg.ex2.last_valid_index()]
 
     # Interpolate missing samples and smoothing
     df_svg = df_svg.interpolate()
-    df_svg["Temperature_int"] = df_svg["Temperature_int"].rolling('20min').mean().round(2)
-    df_svg["Temperature_ext"] = df_svg["Temperature_ext"].rolling('30min').mean().round(2)
-    df_svg["temp_network_int"] = df_svg["temp_network_int"].rolling('20min').mean().round(2)
-    df_svg["temp_network_ext"] = df_svg["temp_network_ext"].rolling('20min').mean().round(2)
+    df_svg["in1"] = df_svg["in1"].rolling('20min').mean().round(2)
+    df_svg["ex1"] = df_svg["ex1"].rolling('30min').mean().round(2)
+    df_svg["in2"] = df_svg["in2"].rolling('20min').mean().round(2)
+    df_svg["ex2"] = df_svg["ex2"].rolling('20min').mean().round(2)
 
     with open('last24h.js', 'w') as f:
         f.write('let temperatures = [\n')
@@ -127,13 +127,13 @@ def generate_graph(generate_svg=False):
     if generate_svg:
         fig, ax1 = plt.subplots()
         # Indoor temperature
-        df_svg["Temperature_int"].plot(color='tab:red')
+        df_svg["int1"].plot(color='tab:red')
         ax1.tick_params(axis='y', labelcolor='tab:red')
         ax1.set_ylabel('Température intérieure', color='tab:red')
         plt.grid(True, which="both", axis="y")
         # Outdoor temperature
         ax2 = ax1.twinx()
-        df_svg["Temperature_ext"].plot(color='tab:blue')
+        df_svg["ex1"].plot(color='tab:blue')
         ax2.tick_params(axis='y', labelcolor='tab:blue')
         ax2.set_ylabel('Température extérieure', color='tab:blue')
         fig.tight_layout()

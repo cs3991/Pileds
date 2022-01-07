@@ -37,6 +37,11 @@
 	margin-bottom: .5rem;
 	line-height: 1.2;
 }
+
+.chart-container{
+    margin: auto;
+}
+
 * {
 	cursor: default !important;
 	pointer-events: all !important;

@@ -132,16 +132,16 @@ def main():
         while 1:
             date = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
             if datetime.now() - past_time_sensor > timedelta(minutes=DELAY_SENSOR):
-                in_temp_1 = round(fetch_all_sensors(), ndigits=1)
-                in_temp_2 = round(fetch_network_sensor_temp('int'), 1)
-                out_temp_2 = round(fetch_network_sensor_temp('ext'), 1)
+                in_temp_1 = round(fetch_all_sensors(), ndigits=2)
+                in_temp_2 = round(fetch_network_sensor_temp('int'), 2)
+                out_temp_2 = round(fetch_network_sensor_temp('ext'), 2)
                 past_time_sensor = datetime.now()
             else:
                 in_temp_1 = ''
                 in_temp_2 = ''
                 out_temp_2 = ''
             if datetime.now() - past_time_api > timedelta(minutes=DELAY_API):
-                out_temp_1 = round(fetch_outdoor_temp(), ndigits=1)
+                out_temp_1 = round(fetch_outdoor_temp(), ndigits=2)
                 past_time_api = datetime.now()
 
             else:
