@@ -74,7 +74,7 @@ def generate_complete_data():
     return indoor_temp, outdoor_temp
 
 
-def generate_graph():
+def generate_graph(generate_svg=False):
     os.chdir('/home/famille/dev/Pileds/')
     matplotlib.use('SVG')
     today = datetime.datetime.now()
@@ -89,8 +89,12 @@ def generate_graph():
                          parse_dates=[0],
                          delimiter=';',
                          names=["DateTimeIndex",
-                                "Temperature_int", "Temperature_ext"],
-                         dtype={"Temperature_int": np.float64, "Temperature_ext": np.float64},
+                                "Temperature_int",
+                                "Temperature_ext",
+                                "temp_network_ext",
+                                "temp_network_int"],
+                         dtype={"Temperature_int": np.float64, "Temperature_ext": np.float64,
+                                "temp_network_ext": np.float64, "temp_network_int": np.float64},
                          decimal=','
                          )
         li.append(df)
@@ -101,36 +105,41 @@ def generate_graph():
     # Save last measured temperatures
     indoor_temp = df_svg.Temperature_int[df_svg.Temperature_int.last_valid_index()]
     outdoor_temp = df_svg.Temperature_ext[df_svg.Temperature_ext.last_valid_index()]
+    indoor_temp2 = df_svg.temp_network_int[df_svg.Temperature_int.last_valid_index()]
+    outdoor_temp2 = df_svg.temp_network_ext[df_svg.Temperature_ext.last_valid_index()]
 
     # Interpolate missing samples and smoothing
     df_svg = df_svg.interpolate()
     df_svg["Temperature_int"] = df_svg["Temperature_int"].rolling('20min').mean().round(2)
     df_svg["Temperature_ext"] = df_svg["Temperature_ext"].rolling('30min').mean().round(2)
+    df_svg["temp_network_int"] = df_svg["temp_network_int"].rolling('20min').mean().round(2)
+    df_svg["temp_network_ext"] = df_svg["temp_network_ext"].rolling('20min').mean().round(2)
 
     with open('last24h.js', 'w') as f:
         f.write('let temperatures = [\n')
         for k, v in df_svg.T.to_dict().items():
             k = k.replace(tzinfo=dateutil.tz.gettz())
-            f.write("{date:" + json.dumps(int(k.timestamp() * 1000)) + ", " + re.sub(r'[{"\']', '', json.dumps(v))+',\n')
+            f.write(
+                "{date:" + json.dumps(int(k.timestamp() * 1000)) + ", " + re.sub(r'[{"\']', '', json.dumps(v)) + ',\n')
         f.write('];')
 
-
     # df_svg.to_csv("last24h.csv", float_format='%.1f')
+    if generate_svg:
+        fig, ax1 = plt.subplots()
+        # Indoor temperature
+        df_svg["Temperature_int"].plot(color='tab:red')
+        ax1.tick_params(axis='y', labelcolor='tab:red')
+        ax1.set_ylabel('Température intérieure', color='tab:red')
+        plt.grid(True, which="both", axis="y")
+        # Outdoor temperature
+        ax2 = ax1.twinx()
+        df_svg["Temperature_ext"].plot(color='tab:blue')
+        ax2.tick_params(axis='y', labelcolor='tab:blue')
+        ax2.set_ylabel('Température extérieure', color='tab:blue')
+        fig.tight_layout()
+        plt.savefig("last24h.svg")
 
-    fig, ax1 = plt.subplots()
-    # Indoor temperature
-    df_svg["Temperature_int"].plot(color='tab:red')
-    ax1.tick_params(axis='y', labelcolor='tab:red')
-    ax1.set_ylabel('Température intérieure', color='tab:red')
-    plt.grid(True, which="both", axis="y")
-    # Outdoor temperature
-    ax2 = ax1.twinx()
-    df_svg["Temperature_ext"].plot(color='tab:blue')
-    ax2.tick_params(axis='y', labelcolor='tab:blue')
-    ax2.set_ylabel('Température extérieure', color='tab:blue')
-    fig.tight_layout()
-    plt.savefig("last24h.svg")
-    return indoor_temp, outdoor_temp
+    return indoor_temp, outdoor_temp, indoor_temp2, outdoor_temp2
 
 
 def main():

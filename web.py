@@ -15,12 +15,15 @@ class Root(object):
 
     @cherrypy.expose
     def index(self):
-        indoor_temp, outdoor_temp = DataProcessing.generate_graph()
+        indoor_temp, outdoor_temp, indoor_temp2, outdoor_temp2 = DataProcessing.generate_graph()
         with open("/home/famille/dev/Pileds/index.html") as file:
             html = ''
             for l in file:
                 html += l
-        return html.format(str(round(indoor_temp, 1)).replace('.', ','), str(round(outdoor_temp, 1)).replace('.', ','))
+        return html.format(in1=str(round(indoor_temp, 1)).replace('.', ','),
+                           out1=str(round(outdoor_temp, 1)).replace('.', ','),
+                           in2=str(round(indoor_temp2, 1)).replace('.', ','),
+                           out2=str(round(outdoor_temp2, 1)).replace('.', ','))
 
     @cherrypy.expose
     def refresh(self):

@@ -8,7 +8,6 @@ from datetime import datetime
 from datetime import timedelta
 import requests
 
-
 API_KEY = '7339f560987519be7f4ef21a7d2dc1ac'
 file_temperature = '/sys/bus/w1/devices/{}/temperature'
 DELAY_API = 10  # Number of minutes to wait between two calls to the api
@@ -70,6 +69,7 @@ def fetch_sensors_list(ids_list):
     in_temp /= len(ids_list)
     return in_temp
 
+
 def fetch_all_sensors():
     """
     Measure and average all sensors currently connected to the raspberry pi
@@ -88,6 +88,21 @@ def fetch_outdoor_temp():
     except:
         print('Error communicating with API')
         return ''
+
+
+def fetch_network_sensor_temp(argument):
+    # try:
+    out = subprocess.Popen(
+        ['ssh', 'pi@192.168.0.16', '/home/pi/ProgrammationAttiny85/ErsatzDeServeur/get_temp.sh', argument],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT)
+    stdout, stderr = out.communicate()
+    temp = float(re.search(r'T=(-?[0-9]+\.?[0-9]*)\/', str(stdout)).group(1))
+    print(f"Network sensor {argument} fetched: {temp} °C")
+    return temp
+    # except:
+    #     print(f'Error getting network sensor {argument} temperature')
+    #     return ''
 
 
 def get_last_temps():
@@ -117,22 +132,27 @@ def main():
         while 1:
             date = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
             if datetime.now() - past_time_sensor > timedelta(minutes=DELAY_SENSOR):
-                in_temp = round(fetch_all_sensors(), ndigits=1)
+                in_temp_1 = round(fetch_all_sensors(), ndigits=1)
+                in_temp_2 = round(fetch_network_sensor_temp('int'), 1)
+                out_temp_2 = round(fetch_network_sensor_temp('ext'), 1)
                 past_time_sensor = datetime.now()
             else:
-                in_temp = ''
+                in_temp_1 = ''
+                in_temp_2 = ''
+                out_temp_2 = ''
             if datetime.now() - past_time_api > timedelta(minutes=DELAY_API):
-                out_temp = round(fetch_outdoor_temp(), ndigits=1)
+                out_temp_1 = round(fetch_outdoor_temp(), ndigits=1)
                 past_time_api = datetime.now()
 
             else:
-                out_temp = ''
+                out_temp_1 = ''
             try:
                 filename = 'temperatures/' + date.split(' ')[0] + '.csv'
                 create_dir(filename, True)
                 with open(filename, 'a') as file:
                     file.write(
-                        date + ';' + str(in_temp).replace('.', ',') + ';' + str(out_temp).replace('.', ',') + '\n')
+                        f"{date};{str(in_temp_1).replace('.', ',')};{str(out_temp_1).replace('.', ',')};"
+                        f"{str(out_temp_2).replace('.', ',')};{str(in_temp_2).replace('.', ',')}\n")
             except IOError:
                 print(datetime.now().strftime("%Y/%m/%d-%H:%M:%S") + " Erreur d'ouverture du fichier")
                 pass
