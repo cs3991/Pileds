@@ -83,7 +83,7 @@ def fetch_outdoor_temp():
             'https://api.openweathermap.org/data/2.5/weather?id=3017879&units=metric&appid=' + API_KEY)
         # print("request sent")
         ex_temp = float(response.json()['main']['temp'])
-        print('Outdoor temp fetched:', ex_temp)
+        print('Outdoor temp fetched:', ex_temp, '°C')
         return ex_temp
     except:
         print('Error communicating with API')
@@ -132,16 +132,33 @@ def main():
         while 1:
             date = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
             if datetime.now() - past_time_sensor > timedelta(minutes=DELAY_SENSOR):
-                in_temp_1 = round(fetch_all_sensors(), ndigits=2)
-                in_temp_2 = round(fetch_network_sensor_temp('int'), 2)
-                out_temp_2 = round(fetch_network_sensor_temp('ext'), 2)
+                try:
+                    in_temp_1 = round(fetch_all_sensors(), ndigits=2)
+                except:
+                    print('ERREUR : Impossible d\'obtenir la température du capteur intérieur')
+                    in_temp_1 = ''
+                try:
+                    in_temp_2 = round(fetch_network_sensor_temp('int'), 2)
+                except:
+                    print('ERREUR : Impossible d\'obtenir la température du capteur intérieur SSH')
+                    in_temp_2 = ''
+                try:
+                    out_temp_2 = round(fetch_network_sensor_temp('ext'), 2)
+                except:
+                    print('ERREUR : Impossible d\'obtenir la température du capteur extérieur SSH')
+                    out_temp_2 = ''
                 past_time_sensor = datetime.now()
             else:
                 in_temp_1 = ''
                 in_temp_2 = ''
                 out_temp_2 = ''
             if datetime.now() - past_time_api > timedelta(minutes=DELAY_API):
-                out_temp_1 = round(fetch_outdoor_temp(), ndigits=2)
+                try:
+                    out_temp_1 = round(fetch_outdoor_temp(), ndigits=2)
+                except:
+                    print('ERREUR : Impossible d\'obtenir la température de l\'API')
+                    out_temp_1 = ''
+
                 past_time_api = datetime.now()
 
             else:
