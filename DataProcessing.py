@@ -103,10 +103,15 @@ def generate_graph(generate_svg=False):
     df_svg = pd.concat(li, axis='index').sort_index()[datetime.datetime.now() - pd.Timedelta('1 day'):]
 
     # Save last measured temperatures
-    indoor_temp = df_svg.in1[df_svg.in1.last_valid_index()]
-    outdoor_temp = df_svg.ex1[df_svg.ex1.last_valid_index()]
-    indoor_temp2 = df_svg.in2[df_svg.in2.last_valid_index()]
-    outdoor_temp2 = df_svg.ex2[df_svg.ex2.last_valid_index()]
+    indoor_temp, outdoor_temp, indoor_temp2, outdoor_temp2 = -274, -274, -274, -274
+    if df_svg.in1.any():
+        indoor_temp = df_svg.in1[df_svg.in1.last_valid_index()]
+    if df_svg.ex1.any():
+        outdoor_temp = df_svg.ex1[df_svg.ex1.last_valid_index()]
+    if df_svg.in2.any():
+        indoor_temp2 = df_svg.in2[df_svg.in2.last_valid_index()]
+    if df_svg.ex2.any():
+        outdoor_temp2 = df_svg.ex2[df_svg.ex2.last_valid_index()]
 
     # Interpolate missing samples and smoothing
     df_svg = df_svg.interpolate()

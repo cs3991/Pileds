@@ -20,10 +20,10 @@ class Root(object):
             html = ''
             for l in file:
                 html += l
-        return html.format(in1=str(round(indoor_temp, 1)).replace('.', ','),
-                           out1=str(round(outdoor_temp, 1)).replace('.', ','),
-                           in2=str(round(indoor_temp2, 1)).replace('.', ','),
-                           out2=str(round(outdoor_temp2, 1)).replace('.', ','))
+        return html.format(in1=str(round(indoor_temp, 1)).replace('.', ',') if indoor_temp != -274 else 'Erreur',
+                           out1=str(round(outdoor_temp, 1)).replace('.', ',') if outdoor_temp != -274 else 'Erreur',
+                           in2=str(round(indoor_temp2, 1)).replace('.', ',') if indoor_temp2 != -274 else 'Erreur',
+                           out2=str(round(outdoor_temp2, 1)).replace('.', ',') if outdoor_temp2 != -274 else 'Erreur')
 
     @cherrypy.expose
     def refresh(self):

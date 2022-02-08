@@ -97,6 +97,7 @@ def fetch_network_sensor_temp(argument):
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
     stdout, stderr = out.communicate()
+    print(stderr, stdout)
     temp = float(re.search(r'T=(-?[0-9]+\.?[0-9]*)\/', str(stdout)).group(1))
     print(f"Network sensor {argument} fetched: {temp} °C")
     return temp
