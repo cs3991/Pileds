@@ -1,3 +1,5 @@
 /temperatures/*
 /complete_data.csv
 /last24h.svg
+/.idea/
+/last24h.js

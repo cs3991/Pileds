@@ -15,7 +15,7 @@ class Root(object):
     @cherrypy.expose
     def index(self):
         indoor_temp, outdoor_temp = DataProcessing.generate_graph()
-        with open("/home/pi/Developpement/pyled/index.html") as file:
+        with open("/home/cedric/dev/pileds/index.html") as file:
             html = ''
             for l in file:
                 html += l
@@ -24,7 +24,7 @@ class Root(object):
     @cherrypy.expose
     def refresh(self):
         indoorTemp, outdoorTemp = DataProcessing.generate_complete_data()
-        with open("/home/pi/Developpement/pyled/current_temp.txt", 'w') as file:
+        with open("/home/cedric/dev/pileds/current_temp.txt", 'w') as file:
             file.write(str(indoorTemp) + " " + str(outdoorTemp))
         print(indoorTemp, outdoorTemp)
         raise cherrypy.HTTPRedirect("/")

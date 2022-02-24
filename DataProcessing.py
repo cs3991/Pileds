@@ -13,7 +13,7 @@ from tictoc import *
 
 def generate_complete_data():
     # for testing on windows : switch commented lines
-    os.chdir('/home/pi/Developpement/pyled/')
+    os.chdir('/home/cedric/dev/pileds/')
     # os.chdir('Z:\Developpement\pyled')
 
     files = glob.glob(r"temperatures/*/*/*.csv", recursive=True)
@@ -73,7 +73,7 @@ def generate_complete_data():
 
 
 def generate_graph():
-    os.chdir('/home/pi/Developpement/pyled/')
+    os.chdir('/home/cedric/dev/pileds/')
     matplotlib.use('SVG')
     today = datetime.datetime.now()
     filenames = [(today - datetime.timedelta(days=1)).strftime('%Y/%m/%d'), today.strftime('%Y/%m/%d')]
