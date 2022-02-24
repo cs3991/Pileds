@@ -1,0 +1,5 @@
+CherryPy~=18.6.1
+requests~=2.25.1
+matplotlib~=3.5.1
+pandas~=1.4.1
+numpy~=1.22.2
